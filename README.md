@@ -1,5 +1,7 @@
 # DRLP2-Continuous-Control
-Udacity Continuous Control Project
+Udacity Continuous Control Project  
+See detailed instruction : https://github.com/udacity/deep-reinforcement-learning/tree/master/p2_continuous-control
+
 
 This folder contains the different files which are necessary to make 20 agents solving Unity Double Joined Arm environment with a reward >30 after about 100 episodes.
 See here under the pre requisites from Udacity to install and Test Unity Environmnent.
@@ -14,11 +16,15 @@ The files in this folders have to be installed in a single repository.
 -model.py :  The document which encode the Actor and Critic Neural Network which have been adapted from DDPG Pendulum
 -The checkpoints actor and critic files where you find the Neural Network Weights
 -Unity environment log
--Python libraries folder to be installed
+
+NB : Python libraries folder have not been uploaded but need to be installed in the same folder
+
+The code have been created thanks to the support of the Udacity Forum members and Kinvo/Henri Chan hints
 
 
 
-The Environment : from Udacity P2 continuous project instruction
+
+The Environment : from Udacity P2 continuous project instruction 
 
 Follow the instructions below to explore the environment on your own machine! You will also learn how to use the Python API to control your agent.
 Step 1: Activate the Environment
