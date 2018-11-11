@@ -1,0 +1,494 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Continuous Control\n",
+    "\n",
+    "---\n",
+    "\n",
+    "You are welcome to use this coding environment to train your agent for the project.  Follow the instructions below to get started!\n",
+    "\n",
+    "### 1. Start the Environment\n",
+    "\n",
+    "Run the next code cell to install a few packages.  This line will take a few minutes to run!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "!pip -q install ./python"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The environments corresponding to both versions of the environment are already saved in the Workspace and can be accessed at the file paths provided below.  \n",
+    "\n",
+    "Please select one of the two options below for loading the environment."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:unityagents:\n",
+      "'Academy' started successfully!\n",
+      "Unity Academy name: Academy\n",
+      "        Number of Brains: 1\n",
+      "        Number of External Brains : 1\n",
+      "        Lesson number : 0\n",
+      "        Reset Parameters :\n",
+      "\t\tgoal_speed -> 1.0\n",
+      "\t\tgoal_size -> 5.0\n",
+      "Unity brain name: ReacherBrain\n",
+      "        Number of Visual Observations (per agent): 0\n",
+      "        Vector Observation space type: continuous\n",
+      "        Vector Observation space size (per agent): 33\n",
+      "        Number of stacked Vector Observation: 1\n",
+      "        Vector Action space type: continuous\n",
+      "        Vector Action space size (per agent): 4\n",
+      "        Vector Action descriptions: , , , \n"
+     ]
+    }
+   ],
+   "source": [
+    "from unityagents import UnityEnvironment\n",
+    "import numpy as np\n",
+    "\n",
+    "# select this option to load version 1 (with a single agent) of the environment\n",
+    "#env = UnityEnvironment(file_name='/data/Reacher_One_Linux_NoVis/Reacher_One_Linux_NoVis.x86_64')\n",
+    "\n",
+    "# select this option to load version 2 (with 20 agents) of the environment\n",
+    "env = UnityEnvironment(file_name='/data/Reacher_Linux_NoVis/Reacher.x86_64')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Environments contain **_brains_** which are responsible for deciding the actions of their associated agents. Here we check for the first brain available, and set it as the default brain we will be controlling from Python."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# get the default brain\n",
+    "brain_name = env.brain_names[0]\n",
+    "brain = env.brains[brain_name]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 2. Examine the State and Action Spaces\n",
+    "\n",
+    "Run the code cell below to print some information about the environment."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Number of agents: 20\n",
+      "Size of each action: 4\n",
+      "There are 20 agents. Each observes a state with length: 33\n",
+      "The state for the first agent looks like: [  0.00000000e+00  -4.00000000e+00   0.00000000e+00   1.00000000e+00\n",
+      "  -0.00000000e+00  -0.00000000e+00  -4.37113883e-08   0.00000000e+00\n",
+      "   0.00000000e+00   0.00000000e+00   0.00000000e+00   0.00000000e+00\n",
+      "   0.00000000e+00   0.00000000e+00  -1.00000000e+01   0.00000000e+00\n",
+      "   1.00000000e+00  -0.00000000e+00  -0.00000000e+00  -4.37113883e-08\n",
+      "   0.00000000e+00   0.00000000e+00   0.00000000e+00   0.00000000e+00\n",
+      "   0.00000000e+00   0.00000000e+00   5.75471878e+00  -1.00000000e+00\n",
+      "   5.55726624e+00   0.00000000e+00   1.00000000e+00   0.00000000e+00\n",
+      "  -1.68164849e-01]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# reset the environment\n",
+    "env_info = env.reset(train_mode=True)[brain_name]\n",
+    "\n",
+    "# number of agents\n",
+    "num_agents = len(env_info.agents)\n",
+    "print('Number of agents:', num_agents)\n",
+    "\n",
+    "# size of each action\n",
+    "action_size = brain.vector_action_space_size\n",
+    "print('Size of each action:', action_size)\n",
+    "\n",
+    "# examine the state space \n",
+    "states = env_info.vector_observations\n",
+    "state_size = states.shape[1]\n",
+    "print('There are {} agents. Each observes a state with length: {}'.format(states.shape[0], state_size))\n",
+    "print('The state for the first agent looks like:', states[0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 3. Take Random Actions in the Environment\n",
+    "\n",
+    "In the next code cell, you will learn how to use the Python API to control the agent and receive feedback from the environment.\n",
+    "\n",
+    "Note that **in this coding environment, you will not be able to watch the agents while they are training**, and you should set `train_mode=True` to restart the environment."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Total score (averaged over agents) this episode: 0.05049999887123704\n"
+     ]
+    }
+   ],
+   "source": [
+    "env_info = env.reset(train_mode=True)[brain_name]      # reset the environment    \n",
+    "states = env_info.vector_observations                  # get the current state (for each agent)\n",
+    "scores = np.zeros(num_agents)                          # initialize the score (for each agent)\n",
+    "while True:\n",
+    "    actions = np.random.randn(num_agents, action_size) # select an action (for each agent)\n",
+    "    actions = np.clip(actions, -1, 1)                  # all actions between -1 and 1\n",
+    "    env_info = env.step(actions)[brain_name]           # send all actions to tne environment\n",
+    "    next_states = env_info.vector_observations         # get next state (for each agent)\n",
+    "    rewards = env_info.rewards                         # get reward (for each agent)\n",
+    "    dones = env_info.local_done                        # see if episode finished\n",
+    "    scores += env_info.rewards                         # update the score (for each agent)\n",
+    "    states = next_states                               # roll over states to next time step\n",
+    "    if np.any(dones):                                  # exit loop if episode finished\n",
+    "        break\n",
+    "print('Total score (averaged over agents) this episode: {}'.format(np.mean(scores)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "When finished, you can close the environment."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#env.close()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 4. It's Your Turn!\n",
+    "\n",
+    "Now it's your turn to train your own agent to solve the environment!  A few **important notes**:\n",
+    "- When training the environment, set `train_mode=True`, so that the line for resetting the environment looks like the following:\n",
+    "```python\n",
+    "env_info = env.reset(train_mode=True)[brain_name]\n",
+    "```\n",
+    "- To structure your work, you're welcome to work directly in this Jupyter notebook, or you might like to start over with a new file!  You can see the list of files in the workspace by clicking on **_Jupyter_** in the top left corner of the notebook.\n",
+    "- In this coding environment, you will not be able to watch the agents while they are training.  However, **_after training the agents_**, you can download the saved model weights to watch the agents on your own machine! "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import random\n",
+    "import torch\n",
+    "from collections import deque\n",
+    "import matplotlib.pyplot as plt\n",
+    "%matplotlib inline\n",
+    "from ddpg_agent import Agent, ReplayBuffer\n",
+    "from unityagents import UnityEnvironment\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "agent = Agent(state_size=33, action_size=4, random_seed=42)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/workspace/ddpg_agent.py:116: UserWarning: torch.nn.utils.clip_grad_norm is now deprecated in favor of torch.nn.utils.clip_grad_norm_.\n",
+      "  torch.nn.utils.clip_grad_norm(self.critic_local.parameters(), 1) #Clipping gradiants of the critic local network, P2 Continuous Project instruction - Benchmarking implementation\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Episode 1\tTotal Average Score: 0.69\tMean: 0.69\n",
+      "Episode 2\tTotal Average Score: 0.78\tMean: 0.87\n",
+      "Episode 3\tTotal Average Score: 0.72\tMean: 0.59\n",
+      "Episode 4\tTotal Average Score: 0.70\tMean: 0.66\n",
+      "Episode 5\tTotal Average Score: 0.74\tMean: 0.90\n",
+      "Episode 6\tTotal Average Score: 0.75\tMean: 0.81\n",
+      "Episode 7\tTotal Average Score: 0.77\tMean: 0.88\n",
+      "Episode 8\tTotal Average Score: 0.79\tMean: 0.89\n",
+      "Episode 9\tTotal Average Score: 0.82\tMean: 1.13\n",
+      "Episode 10\tTotal Average Score: 0.92\tMean: 1.82\n",
+      "Episode 10\tTotal Average Score: 0.92\n",
+      "Episode 11\tTotal Average Score: 1.01\tMean: 1.89\n",
+      "Episode 12\tTotal Average Score: 1.15\tMean: 2.62\n",
+      "Episode 13\tTotal Average Score: 1.28\tMean: 2.82\n",
+      "Episode 14\tTotal Average Score: 1.44\tMean: 3.65\n",
+      "Episode 15\tTotal Average Score: 1.68\tMean: 5.03\n",
+      "Episode 16\tTotal Average Score: 2.02\tMean: 7.04\n",
+      "Episode 17\tTotal Average Score: 2.50\tMean: 10.21\n",
+      "Episode 18\tTotal Average Score: 3.14\tMean: 14.01\n",
+      "Episode 19\tTotal Average Score: 3.80\tMean: 15.74\n",
+      "Episode 20\tTotal Average Score: 4.63\tMean: 20.43\n",
+      "Episode 20\tTotal Average Score: 4.63\n",
+      "Episode 21\tTotal Average Score: 5.44\tMean: 21.54\n",
+      "Episode 22\tTotal Average Score: 6.45\tMean: 27.61\n",
+      "Episode 23\tTotal Average Score: 7.52\tMean: 31.13\n",
+      "Episode 24\tTotal Average Score: 8.53\tMean: 31.74\n",
+      "Episode 25\tTotal Average Score: 9.56\tMean: 34.26\n",
+      "Episode 26\tTotal Average Score: 10.50\tMean: 34.08\n",
+      "Episode 27\tTotal Average Score: 11.46\tMean: 36.40\n",
+      "Episode 28\tTotal Average Score: 12.36\tMean: 36.73\n",
+      "Episode 29\tTotal Average Score: 13.20\tMean: 36.56\n",
+      "Episode 30\tTotal Average Score: 13.97\tMean: 36.29\n",
+      "Episode 30\tTotal Average Score: 13.97\n",
+      "Episode 31\tTotal Average Score: 14.58\tMean: 33.03\n",
+      "Episode 32\tTotal Average Score: 15.28\tMean: 36.90\n",
+      "Episode 33\tTotal Average Score: 15.92\tMean: 36.33\n",
+      "Episode 34\tTotal Average Score: 16.51\tMean: 35.89\n",
+      "Episode 35\tTotal Average Score: 16.95\tMean: 32.13\n",
+      "Episode 36\tTotal Average Score: 17.48\tMean: 36.09\n",
+      "Episode 37\tTotal Average Score: 17.96\tMean: 35.23\n",
+      "Episode 38\tTotal Average Score: 18.42\tMean: 35.21\n",
+      "Episode 39\tTotal Average Score: 18.82\tMean: 34.28\n",
+      "Episode 40\tTotal Average Score: 19.24\tMean: 35.54\n",
+      "Episode 40\tTotal Average Score: 19.24\n",
+      "Episode 41\tTotal Average Score: 19.65\tMean: 35.99\n",
+      "Episode 42\tTotal Average Score: 20.03\tMean: 35.43\n",
+      "Episode 43\tTotal Average Score: 20.37\tMean: 34.81\n",
+      "Episode 44\tTotal Average Score: 20.73\tMean: 36.29\n",
+      "Episode 45\tTotal Average Score: 21.07\tMean: 35.92\n",
+      "Episode 46\tTotal Average Score: 21.41\tMean: 36.69\n",
+      "Episode 47\tTotal Average Score: 21.74\tMean: 36.87\n",
+      "Episode 48\tTotal Average Score: 22.02\tMean: 35.46\n",
+      "Episode 49\tTotal Average Score: 22.32\tMean: 36.42\n",
+      "Episode 50\tTotal Average Score: 22.60\tMean: 36.44\n",
+      "Episode 50\tTotal Average Score: 22.60\n",
+      "Episode 51\tTotal Average Score: 22.90\tMean: 37.84\n",
+      "Episode 52\tTotal Average Score: 23.18\tMean: 37.60\n",
+      "Episode 53\tTotal Average Score: 23.45\tMean: 37.59\n",
+      "Episode 54\tTotal Average Score: 23.71\tMean: 37.33\n",
+      "Episode 55\tTotal Average Score: 23.98\tMean: 38.74\n",
+      "Episode 56\tTotal Average Score: 24.16\tMean: 34.09\n",
+      "Episode 57\tTotal Average Score: 24.39\tMean: 37.19\n",
+      "Episode 58\tTotal Average Score: 24.61\tMean: 36.77\n",
+      "Episode 59\tTotal Average Score: 24.83\tMean: 38.04\n",
+      "Episode 60\tTotal Average Score: 25.05\tMean: 37.64\n",
+      "Episode 60\tTotal Average Score: 25.05\n",
+      "Episode 61\tTotal Average Score: 25.25\tMean: 37.17\n",
+      "Episode 62\tTotal Average Score: 25.46\tMean: 38.56\n",
+      "Episode 63\tTotal Average Score: 25.65\tMean: 37.13\n",
+      "Episode 64\tTotal Average Score: 25.84\tMean: 38.30\n",
+      "Episode 65\tTotal Average Score: 26.02\tMean: 37.58\n",
+      "Episode 66\tTotal Average Score: 26.20\tMean: 37.47\n",
+      "Episode 67\tTotal Average Score: 26.34\tMean: 35.59\n",
+      "Episode 68\tTotal Average Score: 26.51\tMean: 38.35\n",
+      "Episode 69\tTotal Average Score: 26.65\tMean: 35.74\n",
+      "Episode 70\tTotal Average Score: 26.78\tMean: 35.71\n",
+      "Episode 70\tTotal Average Score: 26.78\n",
+      "Episode 71\tTotal Average Score: 26.92\tMean: 36.79\n",
+      "Episode 72\tTotal Average Score: 27.04\tMean: 35.59\n",
+      "Episode 73\tTotal Average Score: 27.17\tMean: 36.58\n",
+      "Episode 74\tTotal Average Score: 27.29\tMean: 36.08\n",
+      "Episode 75\tTotal Average Score: 27.40\tMean: 35.80\n",
+      "Episode 76\tTotal Average Score: 27.55\tMean: 38.35\n",
+      "Episode 77\tTotal Average Score: 27.69\tMean: 38.12\n",
+      "Episode 78\tTotal Average Score: 27.78\tMean: 35.41\n",
+      "Episode 79\tTotal Average Score: 27.90\tMean: 36.97\n",
+      "Episode 80\tTotal Average Score: 28.01\tMean: 36.66\n",
+      "Episode 80\tTotal Average Score: 28.01\n",
+      "Episode 81\tTotal Average Score: 28.09\tMean: 34.72\n",
+      "Episode 82\tTotal Average Score: 28.19\tMean: 35.67\n",
+      "Episode 83\tTotal Average Score: 28.25\tMean: 33.33\n",
+      "Episode 84\tTotal Average Score: 28.32\tMean: 34.13\n",
+      "Episode 85\tTotal Average Score: 28.40\tMean: 35.27\n",
+      "Episode 86\tTotal Average Score: 28.46\tMean: 33.82\n",
+      "Episode 87\tTotal Average Score: 28.52\tMean: 33.83\n",
+      "Episode 88\tTotal Average Score: 28.58\tMean: 33.69\n",
+      "Episode 89\tTotal Average Score: 28.63\tMean: 32.86\n",
+      "Episode 90\tTotal Average Score: 28.67\tMean: 32.00\n",
+      "Episode 90\tTotal Average Score: 28.67\n",
+      "Episode 91\tTotal Average Score: 28.69\tMean: 30.94\n",
+      "Episode 92\tTotal Average Score: 28.72\tMean: 31.36\n",
+      "Episode 93\tTotal Average Score: 28.78\tMean: 33.75\n",
+      "Episode 94\tTotal Average Score: 28.84\tMean: 35.04\n",
+      "Episode 95\tTotal Average Score: 28.89\tMean: 33.43\n",
+      "Episode 96\tTotal Average Score: 28.91\tMean: 31.12\n",
+      "Episode 97\tTotal Average Score: 28.95\tMean: 32.67\n",
+      "Episode 98\tTotal Average Score: 28.99\tMean: 32.73\n",
+      "Episode 99\tTotal Average Score: 29.02\tMean: 31.39\n",
+      "Episode 100\tTotal Average Score: 29.04\tMean: 31.38\n",
+      "Episode 100\tTotal Average Score: 29.04\n",
+      "Episode 101\tTotal Average Score: 29.33\tMean: 30.24\n",
+      "Episode 102\tTotal Average Score: 29.61\tMean: 28.23\n",
+      "Episode 103\tTotal Average Score: 29.92\tMean: 32.03\n",
+      "Episode 104\tTotal Average Score: 30.23\tMean: 31.52\n",
+      "Environment solved after 104 episodes... Total Average score: 30.23\n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x7febc07711d0>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "def ddpg(n_episodes=200, max_t=1000, print_every=10, Target_score=30):\n",
+    "    total_scores_deque = deque(maxlen=100)\n",
+    "    total_scores = []\n",
+    "    \n",
+    "    for i_episode in range(1, n_episodes+1):\n",
+    "\n",
+    "        env_info = env.reset(train_mode=True)[brain_name]       # reset the environment    \n",
+    "        states = env_info.vector_observations                   # get the current state (for each agent)\n",
+    "        scores = np.zeros(num_agents)                           # initialize the score (for each agent)\n",
+    "        agent.reset()\n",
+    "        \n",
+    "        for t in range(max_t):\n",
+    "            actions = agent.act(states)\n",
+    "            env_info = env.step(actions)[brain_name]            # send actions to the env\n",
+    "            next_states = env_info.vector_observations          # get next state (for each agent)\n",
+    "            rewards = env_info.rewards                          # get reward (for each agent)\n",
+    "            \n",
+    "            dones = env_info.local_done                         # Check if episode finished\n",
+    "            \n",
+    "            for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):\n",
+    "                agent.step(state, action, reward, next_state, done) # send Tuples to the agent\n",
+    "            \n",
+    "            scores += env_info.rewards                          # score update (for each agent)\n",
+    "            states = next_states                                # roll over states to next time step\n",
+    "            \n",
+    "            if t % 20 ==0: #  Start Learning from Shared replay buffer from 10 Samples every 20 steps\n",
+    "                for _ in range(10): #  Learn 10 Samples\n",
+    "                    agent.go_learn()\n",
+    "            if np.any(dones):                                   # exit when done\n",
+    "                break\n",
+    "    \n",
+    "        mean_score = np.mean(scores)\n",
+    "        total_scores_deque.append(mean_score)\n",
+    "        total_scores.append(mean_score)\n",
+    "        total_average_score = np.mean(total_scores_deque)\n",
+    "        \n",
+    " \n",
+    "        print('\\rEpisode {}\\tTotal Average Score: {:.2f}\\tMean: {:.2f}'\n",
+    "              .format(i_episode, total_average_score, mean_score))\n",
+    "\n",
+    "        if i_episode % print_every == 0:\n",
+    "            torch.save(agent.actor_local.state_dict(), 'checkpoint_actor.pth')\n",
+    "            torch.save(agent.critic_local.state_dict(), 'checkpoint_critic.pth')\n",
+    "            print('\\rEpisode {}\\tTotal Average Score: {:.2f}'.format(i_episode, total_average_score))  \n",
+    "            \n",
+    "        if total_average_score >= Target_score and i_episode >= 100:\n",
+    "            print('Environment solved after {} episodes... Total Average score: {:.2f}'.format(i_episode, total_average_score))\n",
+    "            torch.save(agent.actor_local.state_dict(), 'checkpoint_actor.pth')\n",
+    "            torch.save(agent.critic_local.state_dict(), 'checkpoint_critic.pth')\n",
+    "            break\n",
+    "    \n",
+    "    return total_scores\n",
+    "\n",
+    "scores = ddpg()\n",
+    "\n",
+    "fig = plt.figure()\n",
+    "ax = fig.add_subplot(111)\n",
+    "plt.plot(np.arange(1, len(scores)+1), scores)\n",
+    "plt.ylabel('Score')\n",
+    "plt.xlabel('Episode #')\n",
+    "plt.show()                    \n",
+    "                      "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
