@@ -19,7 +19,7 @@ The files in this folders have to be installed in a single repository.
 
 NB : Python libraries folder have not been uploaded but need to be installed in the same folder
 
-The code have been created thanks to the support of the Udacity Forum members and Kinvo/Henri Chan hints
+
 
 
 
