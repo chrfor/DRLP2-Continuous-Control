@@ -12,7 +12,7 @@ The files in this folders have to be installed in a single repository.
     -how to start Unity Double Join arm environment (20 agents environment) have been leveraged
     -how to call the API to interact with Unity Double Join arm environment
     -The code to train the DDPG Agent
--ddpg-agent.py : The DDPG agent whihc have been adapted from the Udacity DDPG Pendulum agent
+-ddpg-agent.py : The DDPG agent which have been adapted from the Udacity DDPG Pendulum agent
 -model.py :  The document which encode the Actor and Critic Neural Network which have been adapted from DDPG Pendulum
 -The checkpoints actor and critic files where you find the Neural Network Weights
 -Unity environment log
