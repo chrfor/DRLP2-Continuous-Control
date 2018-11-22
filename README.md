@@ -21,9 +21,6 @@ NB : Python libraries folder have not been uploaded but need to be installed in 
 
 
 
-
-
-
 The Environment : from Udacity P2 continuous project instruction 
 
 Follow the instructions below to explore the environment on your own machine! You will also learn how to use the Python API to control your agent.
