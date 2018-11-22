@@ -1,0 +1,48 @@
+This file describe the learning algorithm which have been set to solve the Double Join Arm Unictiy environment.
+
+The core of learning algorithm comes from the DDPG pendulum which have been adapted to solve the 20 agents environment :
+- Agent Training: (From the core jupyter Continuous_Control.ipynb)
+    - For each episode : 
+      =>the environment is reset
+      =>the state is collected from the environment
+      =>the score matrix for 20 agents is populated with 0
+      =>the agent is reset 
+      
+      - a loop is started to  play up to 1000 time step per episode 
+         - the state is passed to the agent, to get an action back
+         - the action which comes back from the agent is sent to the environnment 
+         - the next state is sent back from the environment 
+         - the reward is send back from the environment 
+         - the information regarded the episode is finished is send back by the environment as well (Done)
+         - a tuple including (State, Action, Reward, Next_State, Done) from all the 20 agents is sent to the function Agent Step 
+           to save the tuple to the Replay Buffer
+         - the score is updated
+         - the next state is triggered
+         - Every 20 time steps, the agent learn from the Replay Buffer, 10 samples (Recommendation Udacity)  
+
+- DDPG_Agent:
+  -The DDPG agent works with continuous state and action space.It's matching with the environnment requirements
+  -The Actor part of the DDPG Agent takes decision of the best action based on a state as input 
+    -The Actor encodes the policy 
+    -The Actor is parametized by a Neural Network. The objective function of the Actor is given by the Critic (which encodes the Value Function - Based on State/Value or Action/Value function 
+  
+  -The critic encodes the value function and tells the actor how good the policy encoded by the agent is .
+ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  -The replay buffer size is updated to match the research paper related to DDPG (See reference in the code)
+  -The Batch_size is updated to 1024 to improve the learning - Smaller batch size did not make the learning algorithm converging
+  
+  
+
