@@ -22,27 +22,16 @@ The core of learning algorithm comes from the DDPG pendulum which have been adap
 
 - DDPG_Agent:
   -The DDPG agent works with continuous state and action space.It's matching with the environnment requirements
-  -The Actor part of the DDPG Agent takes decision of the best action based on a state as input 
-    -The Actor encodes the policy 
-    -The Actor is parametized by a Neural Network. The objective function of the Actor is given by the Critic (which encodes the Value Function - Based on State/Value or Action/Value function 
-  
-  -The critic encodes the value function and tells the actor how good the policy encoded by the agent is .
- 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  -The Actor which encodes the policy makes decision of the best action based on a state as input   
+  -The Actor is parametized by a Neural Network. The objective function of the Actor is given by the Critic 
+  -A replay buffer is used to store and recall actions with specific routine to take into account the tuples from 20 agents
   -The replay buffer size is updated to match the research paper related to DDPG (See reference in the code)
+  -A Noise is added in the process to select the action(Actor) in order to add stochacity in action taken to encourage exploratory behavior.
+  -Action are clipped to -1 to 1 (See forum) to ease the convergence expected
+  -The Critic encodes the value function and tells the actor how good is the policy selected
+  -The Critic is parametized by a Neural Network as well and optimized based on the reward obtained by the Actor
   -The Batch_size is updated to 1024 to improve the learning - Smaller batch size did not make the learning algorithm converging
   
-  
 
+-Model
+  -Batch normalization has been added to each layer of the Actor and Critic model
