@@ -1,0 +1,3 @@
+What are the next steps to optimize the DDPG algorithm 
+- To add different random noise per agent in order to explore the action spaces in a more efficient way (More different directions)
+- To go to MAP
