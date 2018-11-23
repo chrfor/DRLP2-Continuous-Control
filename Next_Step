@@ -1,3 +1,6 @@
 What are the next steps to optimize the DDPG algorithm 
+- To insert API Call to visualize the architecture when training to help debugging the ongoing job
 - To add different random noise per agent in order to explore the action spaces in a more efficient way (More different directions)
-- To go to MAP
+- To rescale the reward of all tasks by a factor of 0.1 to improve the stability as mentionned in the paper "Benchmarking Deep Reinforcement Learning for Continuous Control"
+- To try out other algorithms like Trust Region Policy Optimization (TRPO), Truncated Natural Policy Gradient (TNPG) and Proximal Policy Optimization (PPO) to achieve better performance in an easier way when speaking about PPO
+- To try out the Distributed Distributional Deterministic Policy Gradients (D4PG) sounds to achieve better performance than all the algoritm.
